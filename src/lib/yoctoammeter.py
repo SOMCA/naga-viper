@@ -1,9 +1,7 @@
 import threading
 
 from datetime import timedelta
-from socket import socket
 from time import time
-
 from yoctopuce.yocto_api import YAPI, YRefParam, YModule
 from yoctopuce.yocto_current import YCurrent
 
