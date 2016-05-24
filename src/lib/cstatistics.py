@@ -1,4 +1,5 @@
-from statistics import mean, median, mode, pvariance
+from collections import Counter
+from statistics import mean, median, mode, pvariance, StatisticsError
 
 class CStatistics(object):
     """docstring for CStatistics"""
@@ -38,7 +39,13 @@ class CStatistics(object):
     def cmode(self):
         if hasattr(self, '_mode') and self._mode:
             return self._mode
-        self._mode = mode(self._values)
+        try:
+            self._mode = mode(self._values)
+        except StatisticsError:
+            self._mode = Counter(self._values).most_values()[0]
+        except Exception as e:
+            self._mode = 0
+            print("WARNING -- Most common value canno't be found")
         return self._mode
 
     @property
