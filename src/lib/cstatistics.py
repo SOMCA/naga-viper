@@ -45,7 +45,7 @@ class CStatistics(object):
             self._mode = Counter(self._values).most_values()[0]
         except Exception as e:
             self._mode = 0
-            print("WARNING -- Most common value canno't be found")
+            print("WARNING -- Most common value canno't be found : %s" % e)
         return self._mode
 
     @property
