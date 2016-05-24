@@ -13,7 +13,7 @@ class WebSocketClient(object):
         print("Connection as been established with %s:%s" % (self._host, str(self._port)))
 
     def send_data(self, data):
-        # Start sending data in a single thread
+        # Start sending data in a new thread
         threading.Thread(target=self._websocket.send, args=(data,)).start()
 
     def disconnect(self):
