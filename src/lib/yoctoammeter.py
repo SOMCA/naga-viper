@@ -5,14 +5,14 @@ from time import time
 from yoctopuce.yocto_api import YAPI, YRefParam, YModule
 from yoctopuce.yocto_current import YCurrent
 
+QUIT_STATE = "QUIT"
+DATA_STATE = "DATA"
+NAME_STATE = "NAME"
+
 class YoctoDevice(object):
     """Class to instantiate an ammeter device"""
 
-    QUIT_STATE = "QUIT"
-    DATA_STATE = "DATA"
-    NAME_STATE = "NAME"
-
-    def __init__(self, framerate, network_usage = None):
+    def __init__(self, framerate, code_smell_name = "RELEASE", network_usage = None):
         super(YoctoDevice, self).__init__()
 
         try:
@@ -24,8 +24,9 @@ class YoctoDevice(object):
             self._device.registerTimedReportCallback(self.addMeasure)
             self._finished = threading.Event()
             self._init_time = None
-            self._values = []
+            self._name = code_smell_name
             self._network = network_usage
+            self._values = []
         except Exception as init_exception:
             raise init_exception
 
@@ -53,6 +54,7 @@ class YoctoDevice(object):
         # Close the server automatically
         if self._network:
             self._network.send_data(QUIT_STATE)
+            self._network.disconnect()
         self._finished.set()
 
     def launchMeasure(self):
@@ -133,5 +135,3 @@ class YoctoDevice(object):
         if self._network:
             self._network.connect()
         threading.Thread(target=self.launchMeasure).start()
-        if self._network:
-            self._network.disconnect()
