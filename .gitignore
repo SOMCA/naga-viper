@@ -1,2 +1,4 @@
 __pycache__/
 *~
+*.trace
+*.trace.txt
