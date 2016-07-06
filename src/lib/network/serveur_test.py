@@ -8,6 +8,6 @@ if __name__=='__main__':
     print('{} connected'.format( address ))
     while True:
         
-        response = client.recv(4096)
+        response = client.recv(4096).decode()
         if response != "":
                 print(response)
