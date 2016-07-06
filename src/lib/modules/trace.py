@@ -3,7 +3,7 @@ import subprocess
 import time
 import os
 
-from network.websocket_client import SocketClient
+from ..network.websocket_client import SocketClient
 
 
 class Tracker:
@@ -34,7 +34,7 @@ class Tracker:
             print('Ending ... '+'Your file is : '+self.trace_name)
             time.sleep(1)
             Tracker.cmd('adb pull /mnt/sdcard/'+self.trace_name)
-            time.sleep(5)
+            time.sleep(10)
             #We convert the file into a readable file
             os.system('/home/Android/Sdk/tools/traceview -r '+self.trace_name+' > '+self.trace_name+'.txt')
             #Waiting the conversion of the file
@@ -51,11 +51,14 @@ class Tracker:
             ch = fr.readline()
         fr.readline()
         #We send the interessting data
-        while(ch != ''):
+        while(ch != '' or ch != 'b' or ch != 'b\'\''):
             ch=fr.readline()
+            #time.sleep(1)
             connection.send(ch)
         fr.close()
 
 if __name__ == '__main__':
     t=Tracker('org.bottiger.podcast')
+    t.start_tracking()
     t.send()
+
