@@ -4,14 +4,16 @@ import time
 import os
 
 from ..network.websocket_client import SocketClient
-
+from .adb import *
 
 class Tracker:
 
-    def __init__(self, name):
+    def __init__(self, name, server='127.0.0.1', port=33333):
         self.app_name = name
         self.start = 0
         self.trace_name = ''
+        self.server = server
+        self.port = port
 
     def cmd(chaine):
         tab = chaine.split()
@@ -22,19 +24,20 @@ class Tracker:
         Tracker.cmd('adb shell am start '+self.app_name+'/'+self.app_name+'.MainActivity')
         #the name of the created files will contain the date
         self.trace_name = datetime.date.today().ctime().replace(':','').replace(' ','_')+'.trace'
-        Tracker.cmd('adb shell am profile start '+self.app_name+' /mnt/sdcard/'+self.trace_name)
+        #Tracker.cmd('adb shell am profile start '+self.app_name+' /mnt/sdcard/'+self.trace_name)
+        call_command("profile1", self.app_name, '/mnt/sdcard/'+self.trace_name)
         self.start = 1
         print('Starting ...')
-        time.sleep(1)
-        self.stop_tracking()
 
     def stop_tracking(self):
         if self.start:
-            Tracker.cmd('adb shell am profile stop '+self.app_name+'/'+self.app_name+'MainActivity')
+            #Tracker.cmd('adb shell am profile stop '+self.app_name+'/'+self.app_name+'MainActivity')
+            call_command("profile2", self.app_name+'/'+self.app_name+'MainActivity')
             print('Ending ... '+'Your file is : '+self.trace_name)
             time.sleep(1)
-            Tracker.cmd('adb pull /mnt/sdcard/'+self.trace_name)
-            time.sleep(10)
+            #Tracker.cmd('adb pull /mnt/sdcard/'+self.trace_name)
+            call_command("pull", '/mnt/sdcard/'+self.trace_name)
+            time.sleep(20)
             #We convert the file into a readable file
             os.system('/home/Android/Sdk/tools/traceview -r '+self.trace_name+' > '+self.trace_name+'.txt')
             #Waiting the conversion of the file
@@ -42,7 +45,7 @@ class Tracker:
 
     def send(self):
         connection = SocketClient()
-        connection.connect('127.0.0.1', 33333)
+        connection.connect(self.server, self.port)
         #Opening the file which contains the data
         fr = open(self.trace_name+'.txt','r')
         ch = ''
@@ -53,12 +56,14 @@ class Tracker:
         #We send the interessting data
         while(ch != '' or ch != 'b' or ch != 'b\'\''):
             ch=fr.readline()
-            #time.sleep(1)
-            connection.send(ch)
+            if self.app_name in ch:
+                connection.send(ch)
         fr.close()
 
 if __name__ == '__main__':
     t=Tracker('org.bottiger.podcast')
     t.start_tracking()
+    time.sleep(5)
+    t.stop_tracking()
     t.send()
 
