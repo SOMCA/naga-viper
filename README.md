@@ -1,12 +1,6 @@
 # naga-viper
 Hot-Pepper framework automated test bench
 
-Requires
---------
-
-* ```websocket-client```
-* ```yoctopuce```
-
 Credits
 -------
 
