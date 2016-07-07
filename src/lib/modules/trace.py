@@ -3,8 +3,8 @@ import subprocess
 import time
 import os
 
-from ..network.websocket_client import SocketClient
-from .adb import *
+from ..network.socket_client import SocketClient
+from ..utils.adb_utils import *
 
 class Tracker:
 
@@ -21,7 +21,8 @@ class Tracker:
 
     def start_tracking(self):
         #adb command to start the app : will be useless
-        Tracker.cmd('adb shell am start '+self.app_name+'/'+self.app_name+'.MainActivity')
+        #Tracker.cmd('adb shell am start '+self.app_name+'/'+self.app_name+'.MainActivity')
+        print(get_output(call_command('pull','am','start',self.app_name+'/'+self.app_name+'.MainActivity')))
         #the name of the created files will contain the date
         self.trace_name = datetime.date.today().ctime().replace(':','').replace(' ','_')+'.trace'
         #Tracker.cmd('adb shell am profile start '+self.app_name+' /mnt/sdcard/'+self.trace_name)
